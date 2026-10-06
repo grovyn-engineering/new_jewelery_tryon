@@ -3,7 +3,7 @@ import { categories, products, journal, type Product } from './data'
 import TryOn from './TryOn'
 
 const HERO = '/Images/model1.jpg'
-const BEFORE = '/Images/model2.jpg'
+const BEFORE = '/Images/model1_before.jpg'
 const AFTER = '/Images/model1.jpg'
 const EDITORIAL = '/Images/necklace_new_emerald.jpg'
 const CRAFT = '/Images/diamond5.jpg'

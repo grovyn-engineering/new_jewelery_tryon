@@ -70,10 +70,15 @@ export default function TryOn({
   const [dragOver, setDragOver] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
 
-  // When opened from a product, preselect it and jump straight to photo (or piece if portrait exists).
+  // When opened, always remove old portrait & results and ask for a new portrait.
   useEffect(() => {
-    if (open && initialProduct) {
-      setSelected(initialProduct)
+    if (open) {
+      setPortrait(null)
+      setResultImageUrl(null)
+      setGenerating(false)
+      setApiMessage(null)
+      setStep('photo')
+      setSelected(initialProduct ?? null)
     }
   }, [open, initialProduct])
 
@@ -105,11 +110,13 @@ export default function TryOn({
     if (!file) return
     const url = URL.createObjectURL(file)
     setPortrait(url)
+    setResultImageUrl(null)
     setStep('piece')
   }
 
   const useSample = (url: string) => {
     setPortrait(url)
+    setResultImageUrl(null)
     setStep('piece')
   }
 
@@ -261,7 +268,10 @@ export default function TryOn({
               portrait={portrait}
               selected={selected}
               setSelected={setSelected}
-              onBack={() => setStep('photo')}
+              onBack={() => {
+                setPortrait(null)
+                setStep('photo')
+              }}
               onCreate={create}
               eligible={eligible}
             />

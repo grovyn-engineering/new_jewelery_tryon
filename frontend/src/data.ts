@@ -244,6 +244,7 @@ export const journal: JournalEntry[] = [
 
 // Sample portraits offered inside the try-on flow ("use a sample photo").
 export const samplePortraits: string[] = [
+  '/Images/model1_before.jpg',
   '/Images/model1.jpg',
   '/Images/model2.jpg',
 ]
