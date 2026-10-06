@@ -348,7 +348,7 @@ function Edit({
 
 /* ---------------- Before/After slider ---------------- */
 function BeforeAfter() {
-  const [pos, setPos] = useState(52)
+  const [pos, setPos] = useState(50)
   const ref = useRef<HTMLDivElement>(null)
   const dragging = useRef(false)
 
@@ -357,7 +357,7 @@ function BeforeAfter() {
     if (!el) return
     const rect = el.getBoundingClientRect()
     const x = ((clientX - rect.left) / rect.width) * 100
-    setPos(Math.max(4, Math.min(96, x)))
+    setPos(Math.max(0, Math.min(100, x)))
   }
 
   useEffect(() => {
@@ -379,36 +379,51 @@ function BeforeAfter() {
   return (
     <div
       ref={ref}
-      className="relative aspect-[4/5] w-full select-none overflow-hidden rounded-lg bg-stone"
+      className="relative aspect-[4/5] w-full select-none overflow-hidden rounded-lg bg-stone cursor-ew-resize touch-none"
+      onMouseDown={(e) => {
+        dragging.current = true
+        move(e.clientX)
+      }}
+      onTouchStart={(e) => {
+        dragging.current = true
+        move(e.touches[0].clientX)
+      }}
     >
-      <img src={AFTER} alt="The same portrait wearing an Aurevya piece" className="absolute inset-0 h-full w-full object-cover" draggable={false} />
-      <span className="absolute right-4 top-4 rounded-full bg-ink/70 px-3 py-1 text-xs tracking-wide text-ivory backdrop-blur">
+      {/* Base image: WITH necklace (After) */}
+      <img
+        src={AFTER}
+        alt="Portrait with Aurevya necklace"
+        className="absolute inset-0 h-full w-full object-cover"
+        draggable={false}
+      />
+      <span className="absolute right-4 top-4 rounded-full bg-ink/75 px-3 py-1 text-xs tracking-wide text-ivory backdrop-blur shadow-sm">
         Aurevya Try-On
       </span>
-      <div className="absolute inset-0 overflow-hidden" style={{ width: `${pos}%` }}>
-        <img
-          src={BEFORE}
-          alt="Original portrait before try-on"
-          className="absolute inset-0 h-full w-full object-cover"
-          style={{ width: ref.current?.offsetWidth ?? '100%' }}
-          draggable={false}
-        />
-        <span className="absolute left-4 top-4 rounded-full bg-ivory/85 px-3 py-1 text-xs tracking-wide text-ink">
-          Your photo
-        </span>
-      </div>
-      <button
-        aria-label="Drag to compare"
-        className="absolute top-0 z-10 flex h-full w-10 -translate-x-1/2 cursor-ew-resize items-center justify-center"
-        style={{ left: `${pos}%` }}
-        onMouseDown={() => (dragging.current = true)}
-        onTouchStart={() => (dragging.current = true)}
+
+      {/* Top image: WITHOUT necklace (Before) - clipped via clipPath so dimensions remain 100% identical */}
+      <img
+        src={BEFORE}
+        alt="Original portrait before try-on"
+        className="absolute inset-0 h-full w-full object-cover"
+        style={{ clipPath: `inset(0 ${100 - pos}% 0 0)` }}
+        draggable={false}
+      />
+      <span
+        className="absolute left-4 top-4 rounded-full bg-ivory/85 px-3 py-1 text-xs tracking-wide text-ink shadow-sm transition-opacity duration-200"
+        style={{ opacity: pos > 12 ? 1 : 0 }}
       >
-        <span className="h-full w-px bg-ivory/90" />
-        <span className="absolute grid h-11 w-11 place-items-center rounded-full bg-ivory text-ink shadow-lg">
+        Your photo
+      </span>
+
+      {/* Slider Line & Knob */}
+      <div
+        className="absolute top-0 bottom-0 z-10 w-0.5 bg-ivory/90 shadow-[0_0_8px_rgba(0,0,0,0.4)] -translate-x-1/2 pointer-events-none"
+        style={{ left: `${pos}%` }}
+      >
+        <div className="absolute top-1/2 left-1/2 grid h-10 w-10 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-ivory text-ink shadow-xl text-sm font-bold">
           ⟷
-        </span>
-      </button>
+        </div>
+      </div>
     </div>
   )
 }
