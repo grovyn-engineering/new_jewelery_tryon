@@ -54,10 +54,12 @@ export default function TryOn({
   open,
   onClose,
   initialProduct,
+  onInquireProduct,
 }: {
   open: boolean
   onClose: () => void
   initialProduct?: Product | null
+  onInquireProduct?: (p: Product) => void
 }) {
   const [step, setStep] = useState<Step>('photo')
   const [portrait, setPortrait] = useState<string | null>(null)
@@ -292,7 +294,10 @@ export default function TryOn({
               onSave={saveLook}
               onShare={share}
               onTryAnother={tryAnother}
-              onInquire={() => setToast('An advisor will be in touch about the ' + selected.name)}
+              onInquire={() => {
+                onClose()
+                if (onInquireProduct) onInquireProduct(selected)
+              }}
               eligible={eligible}
               saved={saved}
               onRestart={reset}

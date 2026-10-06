@@ -777,6 +777,7 @@ export default function App() {
   const [tryOnOpen, setTryOnOpen] = useState(false)
   const [tryOnProduct, setTryOnProduct] = useState<Product | null>(null)
   const [bookingOpen, setBookingOpen] = useState(false)
+  const [bookingProduct, setBookingProduct] = useState<Product | null>(null)
   const [wishlistOpen, setWishlistOpen] = useState(false)
   const [wishlist, setWishlist] = useState<string[]>([])
   const [toastMessage, setToastMessage] = useState<string | null>(null)
@@ -792,6 +793,11 @@ export default function App() {
   const openTryOn = (p?: Product) => {
     setTryOnProduct(p ?? null)
     setTryOnOpen(true)
+  }
+
+  const openBooking = (p?: Product | null) => {
+    setBookingProduct(p ?? null)
+    setBookingOpen(true)
   }
 
   const toggleWishlist = (p: Product) => {
@@ -838,19 +844,29 @@ export default function App() {
         <HowItWorks onTryOn={() => openTryOn()} />
         <Editorial />
         <Craft />
-        <Consultation onBook={() => setBookingOpen(true)} />
+        <Consultation onBook={() => openBooking()} />
         <Journal />
       </main>
 
       <Footer
         onTryOn={() => openTryOn()}
-        onBook={() => setBookingOpen(true)}
+        onBook={() => openBooking()}
         onSelectCategory={handleSelectCategory}
         onToast={(msg) => setToastMessage(msg)}
       />
 
-      <TryOn open={tryOnOpen} onClose={() => setTryOnOpen(false)} initialProduct={tryOnProduct} />
-      <BookingModal open={bookingOpen} onClose={() => setBookingOpen(false)} onSuccess={(msg) => setToastMessage(msg)} />
+      <TryOn
+        open={tryOnOpen}
+        onClose={() => setTryOnOpen(false)}
+        initialProduct={tryOnProduct}
+        onInquireProduct={(p) => openBooking(p)}
+      />
+      <BookingModal
+        open={bookingOpen}
+        onClose={() => setBookingOpen(false)}
+        onSuccess={(msg) => setToastMessage(msg)}
+        product={bookingProduct}
+      />
       <WishlistModal
         open={wishlistOpen}
         onClose={() => setWishlistOpen(false)}
