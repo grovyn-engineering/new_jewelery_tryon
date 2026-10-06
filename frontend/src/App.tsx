@@ -567,16 +567,10 @@ function Consultation({ onBook }: { onBook: () => void }) {
           Speak with an Aurevya advisor for a personal, unhurried conversation about the pieces
           you love.
         </p>
-        <div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
+        <div className="mt-9 flex justify-center">
           <button
             onClick={onBook}
-            className="rounded-full bg-ivory px-8 py-3.5 text-sm tracking-wide text-burgundy transition-colors hover:bg-white cursor-pointer"
-          >
-            Inquire about a piece
-          </button>
-          <button
-            onClick={onBook}
-            className="rounded-full border border-ivory/50 px-8 py-3.5 text-sm tracking-wide transition-colors hover:bg-ivory/10 cursor-pointer"
+            className="rounded-full bg-ivory px-9 py-4 text-sm font-medium tracking-wide text-burgundy transition-colors hover:bg-white cursor-pointer shadow-md"
           >
             Book a private viewing
           </button>

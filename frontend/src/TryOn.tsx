@@ -641,9 +641,9 @@ function PreviewStep({
 
           <button
             onClick={onInquire}
-            className="mt-7 rounded-full bg-ink px-8 py-3.5 text-sm tracking-wide text-ivory transition-colors hover:bg-charcoal cursor-pointer"
+            className="mt-7 rounded-full bg-ink px-8 py-3.5 text-sm font-medium tracking-wider text-ivory transition-colors hover:bg-charcoal cursor-pointer uppercase"
           >
-            Inquire about this piece
+            Book a private viewing
           </button>
 
           <div className="mt-3 grid grid-cols-3 gap-2">
