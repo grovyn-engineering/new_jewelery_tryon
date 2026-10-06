@@ -121,10 +121,11 @@ export default function TryOn({
 
     try {
       const userImage = await urlToBase64(portrait)
+      const jewelBase64 = await urlToBase64(selected.image)
       const res = await requestVirtualTryOn({
         userImage,
         jewelTitle: selected.name,
-        jewelImage: selected.image,
+        jewelImage: jewelBase64,
         tryOnType: selected.category || 'necklace',
       })
       if (res.outputImageUrl) {
@@ -152,10 +153,11 @@ export default function TryOn({
 
     try {
       const userImage = await urlToBase64(portrait)
+      const jewelBase64 = await urlToBase64(p.image)
       const res = await requestVirtualTryOn({
         userImage,
         jewelTitle: p.name,
-        jewelImage: p.image,
+        jewelImage: jewelBase64,
         tryOnType: p.category || 'necklace',
       })
       if (res.outputImageUrl) {
