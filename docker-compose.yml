@@ -1,11 +1,9 @@
 services:
-  backend:
+  app:
     build:
-      context: ./backend
+      context: .
       dockerfile: Dockerfile
-    container_name: aurevya_backend
-    ports:
-      - "8000:8000"
+    container_name: aurevya_combined_app
     env_file:
       - .env
     environment:
@@ -17,15 +15,3 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
-
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: aurevya_frontend
-    ports:
-      - "8443:80"
-    depends_on:
-      backend:
-        condition: service_healthy
-    restart: unless-stopped
