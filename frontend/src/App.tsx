@@ -515,9 +515,6 @@ function Editorial() {
             The Nocturne edit is built around contrast — warm gold against low light, a single stone
             given room to breathe. Pieces made to be lived in, not locked away.
           </p>
-          <a href="#jewellery" className="mt-8 text-sm underline underline-offset-4 hover:text-gold">
-            Explore the story →
-          </a>
         </div>
       </div>
     </section>
