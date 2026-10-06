@@ -11,7 +11,7 @@ FROM python:3.11-slim
 # default, and without it the clone fails with a certificate verification
 # error before it ever reaches GitHub.
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    git ca-certificates libgl1 libglib2.0-0 \
+    git ca-certificates libgl1 libglib2.0-0 curl \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
