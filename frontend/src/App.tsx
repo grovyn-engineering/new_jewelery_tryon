@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { categories, products, journal, type Product } from './data'
 import TryOn from './TryOn'
+import { SparkleIcon } from './SparkleIcon'
+import BookingModal from './BookingModal'
+import WishlistModal from './WishlistModal'
 
 const HERO = '/Images/model1.jpg'
 const BEFORE = '/Images/model1_before.jpg'
@@ -11,7 +14,17 @@ const CRAFT = '/Images/diamond5.jpg'
 const NAV = ['Collections', 'Jewellery', 'AI Try-On', 'The Maison', 'Craftsmanship', 'Journal', 'Contact']
 
 /* ---------------- Nav ---------------- */
-function Nav({ onTryOn, onMenu }: { onTryOn: () => void; onMenu: () => void }) {
+function Nav({
+  onTryOn,
+  onMenu,
+  wishlistCount,
+  onWishlistOpen,
+}: {
+  onTryOn: () => void
+  onMenu: () => void
+  wishlistCount: number
+  onWishlistOpen: () => void
+}) {
   const [solid, setSolid] = useState(false)
   useEffect(() => {
     const onScroll = () => setSolid(window.scrollY > 80)
@@ -41,15 +54,25 @@ function Nav({ onTryOn, onMenu }: { onTryOn: () => void; onMenu: () => void }) {
         </a>
 
         <div className="flex items-center justify-end gap-5 text-xs tracking-wide">
-          <button className="hidden hover:opacity-60 sm:inline">Search</button>
-          <button className="hidden hover:opacity-60 sm:inline">Wishlist</button>
+          <button
+            onClick={onWishlistOpen}
+            className="hidden hover:opacity-60 sm:inline flex items-center gap-1 cursor-pointer"
+          >
+            <span>Wishlist</span>
+            {wishlistCount > 0 && (
+              <span className="rounded-full bg-gold px-1.5 py-0.5 text-[10px] text-white font-medium">
+                {wishlistCount}
+              </span>
+            )}
+          </button>
           <button
             onClick={onTryOn}
-            className={`rounded-full px-4 py-2 tracking-wide transition-colors ${
+            className={`inline-flex items-center gap-2 rounded-full px-4 py-2 tracking-wide transition-colors cursor-pointer ${
               solid ? 'bg-ink text-ivory hover:bg-charcoal' : 'bg-ivory/90 text-ink hover:bg-ivory'
             }`}
           >
-            Try it on
+            <SparkleIcon className="w-3.5 h-3.5 text-gold" />
+            <span>Try it on</span>
           </button>
         </div>
       </div>
@@ -87,9 +110,10 @@ function Hero({ onExplore, onTryOn }: { onExplore: () => void; onTryOn: () => vo
             </button>
             <button
               onClick={onTryOn}
-              className="rounded-full border border-ivory/60 px-8 py-3.5 text-sm tracking-wide text-ivory transition-colors hover:border-ivory hover:bg-ivory/10"
+              className="inline-flex items-center justify-center gap-2.5 rounded-full border border-ivory/60 px-8 py-3.5 text-sm tracking-wide text-ivory transition-colors hover:border-ivory hover:bg-ivory/10 cursor-pointer"
             >
-              Experience AI Try-On
+              <SparkleIcon className="w-4 h-4 text-gold" />
+              <span>Experience AI Try-On</span>
             </button>
           </div>
         </div>
@@ -167,7 +191,17 @@ function Categories({ onSelectCategory }: { onSelectCategory: (id: string) => vo
 }
 
 /* ---------------- Product card ---------------- */
-function ProductCard({ p, onTryOn }: { p: Product; onTryOn: (p: Product) => void }) {
+function ProductCard({
+  p,
+  onTryOn,
+  isWishlisted,
+  onToggleWishlist,
+}: {
+  p: Product
+  onTryOn: (p: Product) => void
+  isWishlisted: boolean
+  onToggleWishlist: (p: Product) => void
+}) {
   return (
     <div className="group">
       <div className="relative aspect-[4/5] overflow-hidden rounded-lg bg-stone">
@@ -177,17 +211,26 @@ function ProductCard({ p, onTryOn }: { p: Product; onTryOn: (p: Product) => void
           className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
         />
         <button
-          className="absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-full bg-ivory/85 text-charcoal opacity-0 transition-opacity hover:bg-ivory group-hover:opacity-100"
-          aria-label="Add to wishlist"
+          onClick={(e) => {
+            e.stopPropagation()
+            onToggleWishlist(p)
+          }}
+          className={`absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-full transition-all cursor-pointer shadow-md ${
+            isWishlisted
+              ? 'bg-ivory text-burgundy opacity-100 scale-105 font-bold'
+              : 'bg-ivory/85 text-charcoal opacity-0 hover:bg-ivory group-hover:opacity-100 max-md:opacity-100'
+          }`}
+          aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
         >
-          ♡
+          {isWishlisted ? '♥' : '♡'}
         </button>
         {p.tryOn && (
           <button
             onClick={() => onTryOn(p)}
-            className="absolute inset-x-3 bottom-3 rounded-full bg-ink/85 py-2.5 text-sm tracking-wide text-ivory opacity-0 backdrop-blur transition-all duration-300 hover:bg-ink group-hover:opacity-100 max-md:opacity-100"
+            className="absolute inset-x-3 bottom-3 inline-flex items-center justify-center gap-2.5 rounded-full bg-ink/90 py-3 text-xs font-medium tracking-[0.18em] text-ivory opacity-0 backdrop-blur transition-all duration-300 hover:bg-ink group-hover:opacity-100 max-md:opacity-100 cursor-pointer shadow-lg uppercase"
           >
-            Try it on →
+            <SparkleIcon className="w-4 h-4 text-gold" />
+            <span>TRY YOUR LOOK</span>
           </button>
         )}
       </div>
@@ -207,10 +250,14 @@ function Edit({
   selectedCategory,
   onSelectCategory,
   onTryOn,
+  wishlistIds,
+  onToggleWishlist,
 }: {
   selectedCategory: string
   onSelectCategory: (catId: string) => void
   onTryOn: (p: Product) => void
+  wishlistIds: string[]
+  onToggleWishlist: (p: Product) => void
 }) {
   const isNecklaces = selectedCategory === 'necklaces'
   const filteredProducts = products.filter((p) => p.category === selectedCategory)
@@ -254,11 +301,17 @@ function Edit({
           <div>
             <div className="mt-6 flex items-center justify-between text-xs text-taupe border-b border-stone/60 pb-3">
               <span>Showing Necklaces with AI Virtual Try-On</span>
-              <span className="hidden sm:inline">Click "Try it on" to preview on your portrait</span>
+              <span className="hidden sm:inline">Click "TRY YOUR LOOK" to preview on your portrait</span>
             </div>
             <div className="mt-8 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
               {filteredProducts.map((p) => (
-                <ProductCard key={p.id} p={p} onTryOn={onTryOn} />
+                <ProductCard
+                  key={p.id}
+                  p={p}
+                  onTryOn={onTryOn}
+                  isWishlisted={wishlistIds.includes(p.id)}
+                  onToggleWishlist={onToggleWishlist}
+                />
               ))}
             </div>
           </div>
@@ -379,9 +432,10 @@ function TryOnUSP({ onTryOn }: { onTryOn: () => void }) {
           </p>
           <button
             onClick={onTryOn}
-            className="mt-9 rounded-full bg-ivory px-8 py-3.5 text-sm tracking-wide text-ink transition-colors hover:bg-white"
+            className="mt-9 inline-flex items-center gap-2.5 rounded-full bg-ivory px-8 py-3.5 text-sm tracking-wide text-ink transition-colors hover:bg-white cursor-pointer"
           >
-            Try Aurevya on you
+            <SparkleIcon className="w-4 h-4 text-gold" />
+            <span>Try Aurevya on you</span>
           </button>
         </div>
         <div className="order-1 lg:order-2">
@@ -410,9 +464,10 @@ function HowItWorks({ onTryOn }: { onTryOn: () => void }) {
         </h2>
         <button
           onClick={onTryOn}
-          className="rounded-full border border-ink px-7 py-3 text-sm tracking-wide transition-colors hover:bg-ink hover:text-ivory"
+          className="inline-flex items-center gap-2.5 rounded-full border border-ink px-7 py-3 text-sm tracking-wide transition-colors hover:bg-ink hover:text-ivory cursor-pointer"
         >
-          Try it on
+          <SparkleIcon className="w-4 h-4 text-gold" />
+          <span>Try it on</span>
         </button>
       </div>
       <div className="mt-14 grid gap-x-8 gap-y-10 sm:grid-cols-3">
@@ -490,7 +545,7 @@ function Craft() {
 }
 
 /* ---------------- Consultation ---------------- */
-function Consultation({ onTryOn }: { onTryOn: () => void }) {
+function Consultation({ onBook }: { onBook: () => void }) {
   return (
     <section id="contact" className="bg-burgundy text-ivory">
       <div className="mx-auto max-w-3xl px-5 py-24 text-center sm:px-8 sm:py-32">
@@ -501,12 +556,15 @@ function Consultation({ onTryOn }: { onTryOn: () => void }) {
           you love.
         </p>
         <div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
-          <button className="rounded-full bg-ivory px-8 py-3.5 text-sm tracking-wide text-burgundy transition-colors hover:bg-white">
+          <button
+            onClick={onBook}
+            className="rounded-full bg-ivory px-8 py-3.5 text-sm tracking-wide text-burgundy transition-colors hover:bg-white cursor-pointer"
+          >
             Inquire about a piece
           </button>
           <button
-            onClick={onTryOn}
-            className="rounded-full border border-ivory/50 px-8 py-3.5 text-sm tracking-wide transition-colors hover:bg-ivory/10"
+            onClick={onBook}
+            className="rounded-full border border-ivory/50 px-8 py-3.5 text-sm tracking-wide transition-colors hover:bg-ivory/10 cursor-pointer"
           >
             Book a private viewing
           </button>
@@ -549,7 +607,59 @@ function Journal() {
 }
 
 /* ---------------- Final CTA + Footer ---------------- */
-function Footer({ onTryOn }: { onTryOn: () => void }) {
+function Footer({
+  onTryOn,
+  onBook,
+  onSelectCategory,
+  onToast,
+}: {
+  onTryOn: () => void
+  onBook: () => void
+  onSelectCategory: (catId: string) => void
+  onToast: (msg: string) => void
+}) {
+  const handleLinkClick = (item: string, e: React.MouseEvent) => {
+    e.preventDefault()
+    switch (item) {
+      case 'Collections':
+        document.getElementById('collections')?.scrollIntoView({ behavior: 'smooth' })
+        break
+      case 'The Aurevya Edit':
+        document.getElementById('jewellery')?.scrollIntoView({ behavior: 'smooth' })
+        break
+      case 'High Jewellery':
+        onSelectCategory('high-jewellery')
+        break
+      case 'AI Try-On':
+        onTryOn()
+        break
+      case 'The Maison':
+        document.getElementById('top')?.scrollIntoView({ behavior: 'smooth' })
+        break
+      case 'Craftsmanship':
+        document.getElementById('craftsmanship')?.scrollIntoView({ behavior: 'smooth' })
+        break
+      case 'Journal':
+        document.getElementById('journal')?.scrollIntoView({ behavior: 'smooth' })
+        break
+      case 'Careers':
+        onToast('Atelier careers: Please send your portfolio to careers@aurevya.com')
+        break
+      case 'Private consultation':
+      case 'Care & repair':
+        onBook()
+        break
+      case 'Delivery':
+        onToast('Complimentary insured white-glove delivery available worldwide.')
+        break
+      case 'Contact':
+        document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })
+        break
+      default:
+        document.getElementById('top')?.scrollIntoView({ behavior: 'smooth' })
+    }
+  }
+
   return (
     <footer id="themaison" className="bg-ink text-ivory">
       <div className="mx-auto max-w-[1400px] px-5 py-24 sm:px-8">
@@ -560,9 +670,10 @@ function Footer({ onTryOn }: { onTryOn: () => void }) {
           </h2>
           <button
             onClick={onTryOn}
-            className="mt-9 rounded-full bg-ivory px-9 py-4 text-sm tracking-wide text-ink transition-colors hover:bg-white"
+            className="mt-9 inline-flex items-center gap-2.5 rounded-full bg-ivory px-9 py-4 text-sm tracking-wide text-ink transition-colors hover:bg-white cursor-pointer"
           >
-            See it on you →
+            <SparkleIcon className="w-4 h-4 text-gold" />
+            <span>See it on you →</span>
           </button>
         </div>
 
@@ -583,9 +694,12 @@ function Footer({ onTryOn }: { onTryOn: () => void }) {
               <ul className="mt-4 space-y-2.5 text-sm text-ivory/75">
                 {col.items.map((it) => (
                   <li key={it}>
-                    <a href="#top" className="hover:text-ivory">
+                    <button
+                      onClick={(e) => handleLinkClick(it, e)}
+                      className="hover:text-ivory transition-colors cursor-pointer text-left"
+                    >
                       {it}
-                    </a>
+                    </button>
                   </li>
                 ))}
               </ul>
@@ -596,8 +710,12 @@ function Footer({ onTryOn }: { onTryOn: () => void }) {
         <div className="mt-16 flex flex-col justify-between gap-3 border-t border-ivory/15 pt-6 text-xs text-ivory/50 sm:flex-row">
           <span>© {new Date().getFullYear()} Aurevya Haute Joaillerie</span>
           <div className="flex gap-6">
-            <a href="#privacy" className="hover:text-ivory/80">Privacy Policy</a>
-            <a href="#top" className="hover:text-ivory/80">Terms</a>
+            <button onClick={() => onToast('Aurevya Privacy Policy: Your portrait & data are strictly confidential.')} className="hover:text-ivory/80 cursor-pointer">
+              Privacy Policy
+            </button>
+            <button onClick={() => onToast('Aurevya Terms & Conditions of Haute Joaillerie.')} className="hover:text-ivory/80 cursor-pointer">
+              Terms
+            </button>
           </div>
         </div>
       </div>
@@ -633,9 +751,10 @@ function MobileMenu({ open, onClose, onTryOn }: { open: boolean; onClose: () => 
           onClose()
           onTryOn()
         }}
-        className="mx-5 mt-8 rounded-full bg-ink px-8 py-4 text-sm tracking-wide text-ivory"
+        className="mx-5 mt-8 inline-flex items-center justify-center gap-2.5 rounded-full bg-ink px-8 py-4 text-sm tracking-wide text-ivory cursor-pointer"
       >
-        Try it on →
+        <SparkleIcon className="w-4 h-4 text-gold" />
+        <span>Try it on →</span>
       </button>
     </div>
   )
@@ -645,12 +764,35 @@ function MobileMenu({ open, onClose, onTryOn }: { open: boolean; onClose: () => 
 export default function App() {
   const [tryOnOpen, setTryOnOpen] = useState(false)
   const [tryOnProduct, setTryOnProduct] = useState<Product | null>(null)
+  const [bookingOpen, setBookingOpen] = useState(false)
+  const [wishlistOpen, setWishlistOpen] = useState(false)
+  const [wishlist, setWishlist] = useState<string[]>([])
+  const [toastMessage, setToastMessage] = useState<string | null>(null)
   const [menuOpen, setMenuOpen] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState<string>('necklaces')
+
+  useEffect(() => {
+    if (!toastMessage) return
+    const timer = setTimeout(() => setToastMessage(null), 4500)
+    return () => clearTimeout(timer)
+  }, [toastMessage])
 
   const openTryOn = (p?: Product) => {
     setTryOnProduct(p ?? null)
     setTryOnOpen(true)
+  }
+
+  const toggleWishlist = (p: Product) => {
+    setWishlist((prev) => {
+      const exists = prev.includes(p.id)
+      if (exists) {
+        setToastMessage(`Removed ${p.name} from your Wishlist`)
+        return prev.filter((id) => id !== p.id)
+      } else {
+        setToastMessage(`✨ Added ${p.name} to your Wishlist`)
+        return [...prev, p.id]
+      }
+    })
   }
 
   const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
@@ -662,24 +804,56 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-ivory">
-      <Nav onTryOn={() => openTryOn()} onMenu={() => setMenuOpen(true)} />
+      <Nav
+        onTryOn={() => openTryOn()}
+        onMenu={() => setMenuOpen(true)}
+        wishlistCount={wishlist.length}
+        onWishlistOpen={() => setWishlistOpen(true)}
+      />
       <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} onTryOn={() => openTryOn()} />
 
       <main>
         <Hero onExplore={() => handleSelectCategory('necklaces')} onTryOn={() => openTryOn()} />
         <Categories onSelectCategory={handleSelectCategory} />
-        <Edit selectedCategory={selectedCategory} onSelectCategory={handleSelectCategory} onTryOn={openTryOn} />
+        <Edit
+          selectedCategory={selectedCategory}
+          onSelectCategory={handleSelectCategory}
+          onTryOn={openTryOn}
+          wishlistIds={wishlist}
+          onToggleWishlist={toggleWishlist}
+        />
         <TryOnUSP onTryOn={() => openTryOn()} />
         <HowItWorks onTryOn={() => openTryOn()} />
         <Editorial />
         <Craft />
-        <Consultation onTryOn={() => openTryOn()} />
+        <Consultation onBook={() => setBookingOpen(true)} />
         <Journal />
       </main>
 
-      <Footer onTryOn={() => openTryOn()} />
+      <Footer
+        onTryOn={() => openTryOn()}
+        onBook={() => setBookingOpen(true)}
+        onSelectCategory={handleSelectCategory}
+        onToast={(msg) => setToastMessage(msg)}
+      />
 
       <TryOn open={tryOnOpen} onClose={() => setTryOnOpen(false)} initialProduct={tryOnProduct} />
+      <BookingModal open={bookingOpen} onClose={() => setBookingOpen(false)} onSuccess={(msg) => setToastMessage(msg)} />
+      <WishlistModal
+        open={wishlistOpen}
+        onClose={() => setWishlistOpen(false)}
+        wishlistIds={wishlist}
+        onRemove={(id) => setWishlist((prev) => prev.filter((x) => x !== id))}
+        onTryOn={(p) => openTryOn(p)}
+      />
+
+      {toastMessage && (
+        <div className="fixed bottom-6 left-1/2 z-[150] -translate-x-1/2 pointer-events-none transition-all">
+          <div className="rounded-full bg-ink/95 px-6 py-3.5 text-sm text-ivory shadow-2xl border border-gold/40 backdrop-blur flex items-center gap-2">
+            <span>{toastMessage}</span>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { products, samplePortraits, type Product } from './data'
 import { requestVirtualTryOn } from './api'
+import { SparkleIcon } from './SparkleIcon'
 
 type Step = 'photo' | 'piece' | 'preview'
 
@@ -229,7 +230,10 @@ export default function TryOn({
         <header className="flex items-center justify-between border-b border-stone/70 px-5 py-4 sm:px-8">
           <div className="flex flex-col gap-0.5">
             <span className="font-serif text-lg tracking-wide">Aurevya</span>
-            <span className="eyebrow text-taupe">AI Virtual Try-On</span>
+            <span className="eyebrow text-gold inline-flex items-center gap-1">
+              <SparkleIcon className="w-3 h-3 text-gold" />
+              <span>AI Virtual Try-On</span>
+            </span>
           </div>
           <div className="hidden md:block">
             <StepDots step={step} />
@@ -353,9 +357,10 @@ function PhotoStep({
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
           <button
             onClick={() => fileRef.current?.click()}
-            className="rounded-full bg-ink px-7 py-3.5 text-sm tracking-wide text-ivory transition-colors hover:bg-charcoal cursor-pointer"
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-ink px-7 py-3.5 text-sm tracking-wide text-ivory transition-colors hover:bg-charcoal cursor-pointer"
           >
-            Upload portrait
+            <SparkleIcon className="w-4 h-4 text-gold" />
+            <span>Upload portrait</span>
           </button>
           <button
             onClick={() => onSample(samplePortraits[0])}
